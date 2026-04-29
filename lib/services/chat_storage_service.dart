@@ -107,4 +107,14 @@ class ChatStorageService extends GetxService {
       _settingsBox.get('backend_type', defaultValue: 'cpu') as String;
 
   set backendType(String value) => _settingsBox.put('backend_type', value);
+
+  // ── Performance Mode (Low RAM) ────────────────────────────
+
+  bool get performanceModeEnabled =>
+      _settingsBox.get('performance_mode', defaultValue: false) as bool;
+
+  set performanceModeEnabled(bool value) =>
+      _settingsBox.put('performance_mode', value);
+
+  int get contextSize => performanceModeEnabled ? 512 : 1024;
 }

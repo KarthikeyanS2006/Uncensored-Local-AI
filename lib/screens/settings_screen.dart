@@ -133,15 +133,22 @@ class _SettingsBody extends StatelessWidget {
                       style: TextStyle(color: context.textD, fontSize: 12),
                     ),
                     trailing: FutureBuilder<bool>(
-                      future: BackgroundOptimizerService.isOptimizationDisabled(),
+                      future:
+                          BackgroundOptimizerService.isOptimizationDisabled(),
                       builder: (context, snapshot) {
                         final disabled = snapshot.data ?? false;
                         if (disabled) {
-                          return const Icon(Icons.check_circle_rounded,
-                              color: AppColors.green, size: 20);
+                          return const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.green,
+                            size: 20,
+                          );
                         }
-                        return const Icon(Icons.arrow_forward_ios_rounded,
-                            size: 14, color: AppColors.orange);
+                        return const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 14,
+                          color: AppColors.orange,
+                        );
                       },
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -284,6 +291,49 @@ class _SettingsBody extends StatelessWidget {
 
               const SizedBox(height: 28),
 
+              // ── Performance Mode ─────────────────────────────
+              _sectionHeader(context, 'Performance Mode (Low RAM)'),
+              const SizedBox(height: 8),
+              Text(
+                'Optimize for devices with 2-3GB RAM. Reduces memory usage but may slow down responses.',
+                style: TextStyle(fontSize: 12, color: context.textD),
+              ),
+              const SizedBox(height: 12),
+              _card(
+                context,
+                child: Obx(
+                  () => SwitchListTile(
+                    title: Text(
+                      'Low Memory Mode',
+                      style: TextStyle(color: context.text, fontSize: 14),
+                    ),
+                    subtitle: Text(
+                      storage.performanceModeEnabled
+                          ? 'Context: 512 tokens • Lower memory'
+                          : 'Context: 1024 tokens • Standard',
+                      style: TextStyle(color: context.textD, fontSize: 12),
+                    ),
+                    secondary: Icon(
+                      storage.performanceModeEnabled
+                          ? Icons.speed_rounded
+                          : Icons.memory_outlined,
+                      color: storage.performanceModeEnabled
+                          ? AppColors.perfMode
+                          : context.textM,
+                    ),
+                    value: storage.performanceModeEnabled,
+                    onChanged: (val) => storage.performanceModeEnabled = val,
+                    activeThumbColor: AppColors.perfMode,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
               // ── Local API Server ──────────────────────────
               _sectionHeader(context, 'Local API Server'),
               const SizedBox(height: 8),
@@ -392,17 +442,26 @@ class _SettingsBody extends StatelessWidget {
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: AppColors.orange.withOpacity(0.1),
-                              border: Border.all(color: AppColors.orange.withOpacity(0.3)),
+                              border: Border.all(
+                                color: AppColors.orange.withOpacity(0.3),
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.orange),
+                                const Icon(
+                                  Icons.warning_amber_rounded,
+                                  size: 16,
+                                  color: AppColors.orange,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'Anyone on your network can access your loaded model.',
-                                    style: TextStyle(fontSize: 11, color: context.text),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: context.text,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -420,8 +479,10 @@ class _SettingsBody extends StatelessWidget {
                                     : Future.value(null),
                                 builder: (context, snapshot) {
                                   String url = apiServer.baseUrl;
-                                  if (apiServer.allInterfaces.value && snapshot.hasData) {
-                                    url = 'http://${snapshot.data}:${apiServer.port.value}/v1';
+                                  if (apiServer.allInterfaces.value &&
+                                      snapshot.hasData) {
+                                    url =
+                                        'http://${snapshot.data}:${apiServer.port.value}/v1';
                                   }
                                   return SelectableText(
                                     url,
@@ -431,7 +492,7 @@ class _SettingsBody extends StatelessWidget {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   );
-                                }
+                                },
                               ),
                             ),
                           ],
@@ -630,7 +691,7 @@ class _SettingsBody extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-              
+
               OutlinedButton.icon(
                 icon: const Icon(Icons.cleaning_services_rounded, size: 18),
                 label: const Text(
@@ -685,8 +746,11 @@ class _SettingsBody extends StatelessWidget {
                       color: AppColors.orange.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.article_outlined,
-                        size: 18, color: AppColors.orange),
+                    child: const Icon(
+                      Icons.article_outlined,
+                      size: 18,
+                      color: AppColors.orange,
+                    ),
                   ),
                   title: Text(
                     'App Logs',
@@ -696,8 +760,11 @@ class _SettingsBody extends StatelessWidget {
                     'View logs, errors & share with developers',
                     style: TextStyle(color: context.textD, fontSize: 12),
                   ),
-                  trailing: Icon(Icons.arrow_forward_ios_rounded,
-                      size: 14, color: context.textD),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: context.textD,
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 4,
@@ -775,12 +842,16 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
   static Map<String, dynamic> _detectBestConfig() {
     if (!Platform.isAndroid && !Platform.isIOS) {
       // Desktop: CPU is safest, Vulkan if available
-      return {'backend': 'cpu', 'gpuLayers': 0, 'reason': 'CPU mode — most compatible on desktop'};
+      return {
+        'backend': 'cpu',
+        'gpuLayers': 0,
+        'reason': 'CPU mode — most compatible on desktop',
+      };
     }
 
     // Android/iOS: detect available RAM and processor count
     final cores = Platform.numberOfProcessors;
-    
+
     if (cores >= 8) {
       // High-end device (e.g. Snapdragon 8 Gen 2+, Dimensity 9000+)
       return {
@@ -796,11 +867,12 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
         'reason': 'CPU mode — safe for mid-range devices ($cores cores)',
       };
     } else {
-      // Low-end device
+      // Low-end device (2-4 cores) — recommend low memory mode
       return {
         'backend': 'cpu',
         'gpuLayers': 0,
-        'reason': 'CPU mode — optimized for lower-end devices ($cores cores)',
+        'reason':
+            'CPU mode — low-end device detected. Enable Low Memory Mode in settings for best experience.',
       };
     }
   }
@@ -874,11 +946,19 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
           // ── Recommended Auto Config ──
           Row(
             children: [
-              Icon(Icons.auto_awesome_rounded, size: 18, color: AppColors.accent),
+              Icon(
+                Icons.auto_awesome_rounded,
+                size: 18,
+                color: AppColors.accent,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Compute Device',
-                style: TextStyle(color: context.text, fontSize: 15, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: context.text,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -901,7 +981,9 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ),
@@ -914,7 +996,11 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline_rounded, size: 14, color: AppColors.accent),
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 14,
+                  color: AppColors.accent,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -975,14 +1061,20 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
                   style: TextStyle(color: context.text, fontSize: 14),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: context.bgInput,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     _gpuLayers.toInt().toString(),
-                    style: TextStyle(color: context.text, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: context.text,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -1043,4 +1135,3 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
     );
   }
 }
-

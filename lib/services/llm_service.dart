@@ -61,7 +61,9 @@ class LlmService extends GetxService {
   /// Load a GGUF model from [path] with progress tracking.
   Future<void> loadModel(String path) async {
     LogService? log;
-    try { log = Get.find<LogService>(); } catch (_) {}
+    try {
+      log = Get.find<LogService>();
+    } catch (_) {}
 
     // Verify file exists first
     final file = File(path);
@@ -150,10 +152,11 @@ class LlmService extends GetxService {
       // Use smaller context on Android to prevent OOM kills.
       // Desktop can handle 2048, but Android devices with limited RAM
       // need 1024 to avoid the Low Memory Killer (LMK).
-      final contextSize = Platform.isAndroid ? 1024 : 2048;
-
-      // Map the string backend to GpuBackend enum
+      // Performance mode uses 512 for very low RAM devices (2-3GB).
       final storage = Get.find<ChatStorageService>();
+      final contextSize = storage.performanceModeEnabled
+          ? 512
+          : (Platform.isAndroid ? 1024 : 2048);
       GpuBackend parsedBackend;
       switch (storage.backendType) {
         case 'vulkan':
@@ -172,13 +175,16 @@ class LlmService extends GetxService {
       // Optimize threads: 4 for both generation and batch processing to keep memory stable.
       final params = ModelParams(
         contextSize: contextSize,
-        gpuLayers: userGpuLayers, 
+        gpuLayers: userGpuLayers,
         preferredBackend: parsedBackend,
-        numberOfThreads: Platform.numberOfProcessors > 4 ? 4 : 0, 
+        numberOfThreads: Platform.numberOfProcessors > 4 ? 4 : 0,
         numberOfThreadsBatch: Platform.numberOfProcessors > 4 ? 4 : 0,
       );
 
-      log?.info('Backend=$parsedBackend, GPU layers=$userGpuLayers, ctx=$contextSize, threads=${Platform.numberOfProcessors > 4 ? 4 : 0}', source: 'LLM');
+      log?.info(
+        'Backend=$parsedBackend, GPU layers=$userGpuLayers, ctx=$contextSize, threads=${Platform.numberOfProcessors > 4 ? 4 : 0}',
+        source: 'LLM',
+      );
 
       await _engine!.loadModel(path, modelParams: params);
       progressTimer.cancel();
